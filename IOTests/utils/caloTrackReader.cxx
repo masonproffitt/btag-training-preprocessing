@@ -1,3 +1,9 @@
+/// @file caloTrackReader.cxx
+/// @brief Test reading the main calo cluster and track particle container
+///
+/// This test simply reads in the static payload of the main calo cluster and
+/// track particle container of a primary xAOD. And checks how fast this can
+/// actually be done.
 
 // System include(s):
 #include <memory>
