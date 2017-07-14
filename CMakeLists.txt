@@ -12,7 +12,7 @@ find_package( AnalysisBase 21.2 REQUIRED )
 atlas_ctest_setup()
 
 # Set up the HSSIPAnalysis project:
-atlas_project( AnalysisBaseIOTests 1.0.0
+atlas_project( BTagTrainingPreprocessing 1.0.0
    USE AnalysisBase ${AnalysisBase_VERSION} )
 
 # Set up the runtime environment setup script(s):

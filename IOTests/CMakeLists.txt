@@ -3,7 +3,7 @@
 #
 
 # Set the name of the package:
-atlas_subdir( IOTests )
+atlas_subdir( BTagTrainingPreprocessing )
 
 # Packages that this package depends on:
 atlas_depends_on_subdirs(
@@ -16,7 +16,7 @@ atlas_depends_on_subdirs(
 find_package( ROOT COMPONENTS Core RIO REQUIRED )
 
 # Build the test executable:
-atlas_add_executable( caloTrackReader
-   utils/caloTrackReader.cxx
+atlas_add_executable( dump-test
+   utils/dump-test.cxx
    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
    LINK_LIBRARIES ${ROOT_LIBRARIES} xAODRootAccess xAODCaloEvent xAODTracking )

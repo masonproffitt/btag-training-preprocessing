@@ -1,9 +1,9 @@
-/// @file caloTrackReader.cxx
+/// @file dump-test.cxx
 /// @brief Test reading the main calo cluster and track particle container
 ///
-/// This test simply reads in the static payload of the main calo cluster and
-/// track particle container of a primary xAOD. And checks how fast this can
-/// actually be done.
+/// This test simply reads in the static payload of the track particle
+/// container of a primary xAOD. And checks how fast this can actually
+/// be done.
 
 // System include(s):
 #include <memory>
@@ -76,15 +76,6 @@ int main( int argc, char* argv[] ) {
          // Print some status:
          if( ! ( entry % 500 ) ) {
             Info( APP_NAME, "Processing entry %lld / %lld", entry, entries );
-         }
-
-         // Read the cluster container:
-         const xAOD::CaloClusterContainer* ccc = 0;
-         RETURN_CHECK( APP_NAME, event.retrieve( ccc, "CaloCalTopoClusters" ) );
-
-         // Make sure that its "core" variables are read in:
-         for( const xAOD::CaloCluster* cc : *ccc ) {
-            dummy += cc->pt();
          }
 
          // Read the track particles:
