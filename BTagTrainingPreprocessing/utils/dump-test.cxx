@@ -5,6 +5,9 @@
 /// container of a primary xAOD. And checks how fast this can actually
 /// be done.
 
+// local inclues
+#include "SomeTool.h"
+
 // System include(s):
 #include <memory>
 
@@ -26,8 +29,11 @@
 
 int main( int argc, char* argv[] ) {
 
+  // test the added tool in SomeTool.hh
+  std::cout << "SomeTool gives: " << getANumber() << std::endl;
+
    // The name of the application:
-   static const char* APP_NAME = "caloTrackReader";
+   static const char* APP_NAME = "BTagTestDumper";
 
    // Check that at least one input file was provided:
    if( argc < 2 ) {

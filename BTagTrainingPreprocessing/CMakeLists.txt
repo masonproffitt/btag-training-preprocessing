@@ -17,6 +17,7 @@ find_package( ROOT COMPONENTS Core RIO REQUIRED )
 
 # Build the test executable:
 atlas_add_executable( dump-test
-   utils/dump-test.cxx
-   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-   LINK_LIBRARIES ${ROOT_LIBRARIES} xAODRootAccess xAODCaloEvent xAODTracking )
+   utils/dump-test.cxx src/*.cxx
+   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src
+   LINK_LIBRARIES ${ROOT_LIBRARIES}
+   xAODRootAccess xAODCaloEvent xAODTracking)
