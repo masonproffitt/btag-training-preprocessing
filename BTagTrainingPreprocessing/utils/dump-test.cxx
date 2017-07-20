@@ -26,6 +26,7 @@
 #include "xAODCore/tools/ReadStats.h"
 #include "xAODCaloEvent/CaloClusterContainer.h"
 #include "xAODTracking/TrackParticleContainer.h"
+#include "xAODJet/JetContainer.h"
 
 int main( int argc, char* argv[] ) {
 
@@ -85,12 +86,19 @@ int main( int argc, char* argv[] ) {
          }
 
          // Read the track particles:
-         const xAOD::TrackParticleContainer* tpc = 0;
-         RETURN_CHECK( APP_NAME, event.retrieve( tpc, "InDetTrackParticles" ) );
+         const xAOD::TrackParticleContainer *tpc = 0;
+         RETURN_CHECK( APP_NAME, event.retrieve(tpc, "InDetTrackParticles") );
 
          // Read in its core variables:
-         for( const xAOD::TrackParticle* tp : *tpc ) {
+         for (const xAOD::TrackParticle *tp : *tpc) {
             dummy += tp->pt();
+         }
+
+         const xAOD::JetContainer *jets = 0;
+         RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKtVR30Rmax4Rmin02TrackJets") );
+
+         for (const xAOD::Jet *jet : *jets) {
+            Info( APP_NAME, "MV2c10 discriminant: %g", jet->btagging()->auxdata<double>("MV2c10_discriminant") );
          }
       }
    }
