@@ -1,2 +1,10 @@
+# build artifacts
 /build/
 .asetup*
+
+# binary files
+*.root
+*.h5
+
+# Sometimes I like to leave longer commit messages via `commit -F`
+commit.txt

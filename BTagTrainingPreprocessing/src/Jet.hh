@@ -1,10 +1,10 @@
-#ifndef FLAVORTAGGINGVARIABLES_H
-#define FLAVORTAGGINGVARIABLES_H
+#ifndef JET_HH
+#define JET_HH
 
 #include "xAODJet/Jet.h"
 
-typedef struct FlavorTaggingVariables {
-
+typedef struct Jet
+{
 	double mv2c10_discriminant;
 
 	int jf_nvtx;
@@ -36,9 +36,8 @@ typedef struct FlavorTaggingVariables {
 	float sv1_dR;
 	float sv1_Lxy;
 	float sv1_L3d;
+} Jet;
 
-} FlavorTaggingVariables;
+void fillFlavorTaggingVariables(const xAOD::Jet &jet, Jet &out_jet);
 
-void fillFlavorTaggingVariables(FlavorTaggingVariables &vars, const xAOD::Jet &jet);
-
-#endif // FLAVORTAGGINGVARIABLES_H
+#endif // JET_HH

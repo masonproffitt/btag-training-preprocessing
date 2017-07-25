@@ -9,3 +9,9 @@ echo "=== running lsetup ==="
 lsetup asetup
 echo "=== running asetup ==="
 asetup AnalysisBase,21.2.0
+
+# setup HDF5
+echo "=== setting up HDF5 ==="
+lsetup hdf5
+
+

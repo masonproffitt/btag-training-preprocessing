@@ -6,8 +6,9 @@
 /// be done.
 
 // local inclues
-#include "SomeTool.h"
-#include "FlavorTaggingVariables.h"
+#include "HDF5WriterAbstraction.hh"
+#include "Track.hh"
+#include "Jet.hh"
 
 // System include(s):
 #include <memory>
@@ -31,10 +32,6 @@
 
 int main (int argc, char *argv[])
 {
-
-  // test the added tool in SomeTool.hh
-  std::cout << "SomeTool gives: " << getANumber() << std::endl;
-
 	// The name of the application:
 	static const char *APP_NAME = "BTagTestDumper";
 
@@ -48,7 +45,11 @@ int main (int argc, char *argv[])
 	RETURN_CHECK( APP_NAME, xAOD::Init() );
 
 	// Set up the event object:
-	xAOD::TEvent event(xAOD::TEvent::kClassAccess);
+	xAOD::TEvent event( xAOD::TEvent::kClassAccess );
+
+	// Set up output file
+	std::string output_file = "output.h5";
+	HDF5WriterAbstraction h5writer(output_file.c_str());
 
 	// Start the measurement:
 	auto ps = xAOD::PerfStats::instance();
@@ -90,52 +91,33 @@ int main (int argc, char *argv[])
 			const xAOD::TrackParticleContainer *tpc = 0;
 			RETURN_CHECK( APP_NAME, event.retrieve(tpc, "InDetTrackParticles") );
 
+			// make a vector to store tracks to HDF5. Note that these
+			// should come from the tracks associated to jets in the
+			// future.
+			std::vector<Track> tracks;
+
 			// Read in its core variables:
 			for (const xAOD::TrackParticle *tp : *tpc) {
 				dummy += tp->pt();
+				Track out_track;
+				out_track.pt = tp->pt();
+				tracks.push_back(out_track);
 			}
+			h5writer.add_tracks(tracks);
 
 			const xAOD::JetContainer *jets = 0;
 			RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKtVR30Rmax4Rmin02TrackJets") );
 
-			FlavorTaggingVariables ftvars;
 			for (const xAOD::Jet *jet : *jets) {
-				fillFlavorTaggingVariables(ftvars, *jet);
-
-				Info( APP_NAME, "mv2c10_discriminant: %g", ftvars.mv2c10_discriminant );
-
-				Info( APP_NAME, "jf_nvtx: %d", ftvars.jf_nvtx );
-				Info( APP_NAME, "jf_nvtx1t: %d", ftvars.jf_nvtx1t );
-				Info( APP_NAME, "jf_ntrkAtVx: %d", ftvars.jf_ntrkAtVx );
-				Info( APP_NAME, "jf_n2tv: %d", ftvars.jf_n2tv );
-				Info( APP_NAME, "jf_efrc: %g", ftvars.jf_efrc );
-				Info( APP_NAME, "jf_mass: %g", ftvars.jf_mass );
-				Info( APP_NAME, "jf_sig3d: %g", ftvars.jf_sig3d );
-				Info( APP_NAME, "jf_dphi: %g", ftvars.jf_dphi );
-				Info( APP_NAME, "jf_deta: %g", ftvars.jf_deta );
-				Info( APP_NAME, "jf_mass_uncor: %g", ftvars.jf_mass_uncor );
-				Info( APP_NAME, "jf_dR_flight: %g", ftvars.jf_dR_flight );
-
-				Info( APP_NAME, "ip2d_pb: %g", ftvars.ip2d_pb );
-				Info( APP_NAME, "ip2d_pc: %g", ftvars.ip2d_pc );
-				Info( APP_NAME, "ip2d_pu: %g", ftvars.ip2d_pu );
-
-				Info( APP_NAME, "ip3d_pb: %g", ftvars.ip3d_pb );
-				Info( APP_NAME, "ip3d_pc: %g", ftvars.ip3d_pc );
-				Info( APP_NAME, "ip3d_pu: %g", ftvars.ip3d_pu );
-
-				Info( APP_NAME, "sv1_n2t: %d", ftvars.sv1_n2t );
-				Info( APP_NAME, "sv1_ntrkv: %d", ftvars.sv1_ntrkv );
-				Info( APP_NAME, "sv1_mass: %g", ftvars.sv1_mass );
-				Info( APP_NAME, "sv1_efrc: %g", ftvars.sv1_efrc );
-				Info( APP_NAME, "sv1_sig3d: %g", ftvars.sv1_sig3d );
-				Info( APP_NAME, "sv1_distmatlay: %g", ftvars.sv1_distmatlay );
-				Info( APP_NAME, "sv1_dR: %g", ftvars.sv1_dR );
-				Info( APP_NAME, "sv1_Lxy: %g", ftvars.sv1_Lxy );
-				Info( APP_NAME, "sv1_L3d: %g", ftvars.sv1_L3d );
+				Jet out_jet;
+				fillFlavorTaggingVariables(*jet, out_jet);
+				h5writer.add_jet(out_jet);
 			}
 		}
 	}
+
+	h5writer.flush();
+	h5writer.close();
 
 	// Make a dummy printout just to make sure that C++ optimisations don't
 	// remove the file reading commands:
