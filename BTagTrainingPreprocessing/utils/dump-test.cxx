@@ -55,9 +55,6 @@ int main (int argc, char *argv[])
 	auto ps = xAOD::PerfStats::instance();
 	ps.start();
 
-	// Dummy variable:
-	double dummy = 0.0;
-
 	// Loop over the specified files:
 	for (int i = 1; i < argc; ++i) {
 
@@ -98,7 +95,6 @@ int main (int argc, char *argv[])
 
 			// Read in its core variables:
 			for (const xAOD::TrackParticle *tp : *tpc) {
-				dummy += tp->pt();
 				Track out_track;
 				out_track.pt = tp->pt();
 				tracks.push_back(out_track);
@@ -118,10 +114,6 @@ int main (int argc, char *argv[])
 
 	h5writer.flush();
 	h5writer.close();
-
-	// Make a dummy printout just to make sure that C++ optimisations don't
-	// remove the file reading commands:
-	Info( APP_NAME, "dummy = %g", dummy );
 
 	// Stop the measurement:
 	ps.stop();
