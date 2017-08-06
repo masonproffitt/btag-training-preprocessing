@@ -46,6 +46,13 @@ namespace h5 {
 	INSERT(sv1_Lxy);
 	INSERT(sv1_L3d);
 
+	INSERT(rnnip_pu);
+	INSERT(rnnip_pc);
+	INSERT(rnnip_pb);
+	INSERT(rnnip_ptau);
+
+	INSERT(particle_id);
+
 #undef INSERT
     return type;
   }

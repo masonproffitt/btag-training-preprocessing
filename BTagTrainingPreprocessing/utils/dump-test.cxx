@@ -26,7 +26,6 @@
 #include "xAODCore/tools/PerfStats.h"
 #include "xAODCore/tools/IOStats.h"
 #include "xAODCore/tools/ReadStats.h"
-#include "xAODCaloEvent/CaloClusterContainer.h"
 #include "xAODTracking/TrackParticleContainer.h"
 #include "xAODJet/JetContainer.h"
 
@@ -102,11 +101,12 @@ int main (int argc, char *argv[])
 			h5writer.add_tracks(tracks);
 
 			const xAOD::JetContainer *jets = 0;
-			RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKtVR30Rmax4Rmin02TrackJets") );
+			RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKt4EMTopoJets") );
 
 			for (const xAOD::Jet *jet : *jets) {
 				Jet out_jet;
 				fillFlavorTaggingVariables(*jet, out_jet);
+				out_jet.particle_id = jet->auxdata<int>("PartonTruthLabelID");
 				h5writer.add_jet(out_jet);
 			}
 		}

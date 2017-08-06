@@ -36,6 +36,13 @@ typedef struct Jet
 	float sv1_dR;
 	float sv1_Lxy;
 	float sv1_L3d;
+
+	double rnnip_pu;
+	double rnnip_pc;
+	double rnnip_pb;
+	double rnnip_ptau;
+
+	int particle_id;
 } Jet;
 
 void fillFlavorTaggingVariables(const xAOD::Jet &jet, Jet &out_jet);

@@ -35,4 +35,9 @@ void fillFlavorTaggingVariables(const xAOD::Jet &jet, Jet &out_jet)
 	btagging->variable<float>("SV1", "deltaR", out_jet.sv1_dR);
 	btagging->variable<float>("SV1", "Lxy", out_jet.sv1_Lxy);
 	btagging->variable<float>("SV1", "L3d", out_jet.sv1_L3d);
+
+	out_jet.rnnip_pu = btagging->auxdata<double>("rnnip_pu");
+	out_jet.rnnip_pc = btagging->auxdata<double>("rnnip_pc");
+	out_jet.rnnip_pb = btagging->auxdata<double>("rnnip_pb");
+	out_jet.rnnip_ptau = btagging->auxdata<double>("rnnip_ptau");
 }
