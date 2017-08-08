@@ -7,10 +7,7 @@ else
     set -eu
 fi
 
-if ! mkdir build >& /dev/null; then
-    echo "build directory already exists, remove it to rebuild"
-    exit 1
-fi
+mkdir -p build
 cd build/
 cmake ..
 make -j 4
