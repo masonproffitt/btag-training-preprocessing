@@ -42,7 +42,8 @@ typedef struct Jet
 	double rnnip_pb;
 	double rnnip_ptau;
 
-	int particle_id;
+	int PartonTruthLabelID;
+	int HadronConeExclTruthLabelID;
 } Jet;
 
 void fillFlavorTaggingVariables(const xAOD::Jet &jet, Jet &out_jet);

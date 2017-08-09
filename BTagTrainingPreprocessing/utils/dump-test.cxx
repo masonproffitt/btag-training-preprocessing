@@ -106,7 +106,8 @@ int main (int argc, char *argv[])
 			for (const xAOD::Jet *jet : *jets) {
 				Jet out_jet;
 				fillFlavorTaggingVariables(*jet, out_jet);
-				out_jet.particle_id = jet->auxdata<int>("PartonTruthLabelID");
+				out_jet.PartonTruthLabelID = jet->auxdata<int>("PartonTruthLabelID");
+				out_jet.HadronConeExclTruthLabelID = jet->auxdata<int>("HadronConeExclTruthLabelID");
 				h5writer.add_jet(out_jet);
 			}
 		}

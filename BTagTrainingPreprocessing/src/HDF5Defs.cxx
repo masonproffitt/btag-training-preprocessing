@@ -51,7 +51,8 @@ namespace h5 {
 	INSERT(rnnip_pb);
 	INSERT(rnnip_ptau);
 
-	INSERT(particle_id);
+	INSERT(PartonTruthLabelID);
+	INSERT(HadronConeExclTruthLabelID);
 
 #undef INSERT
     return type;
