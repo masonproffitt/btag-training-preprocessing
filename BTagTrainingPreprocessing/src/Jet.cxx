@@ -1,3 +1,4 @@
+#include"xAODJet/Jet.h"
 #include "Jet.hh"
 
 void fillFlavorTaggingVariables(const xAOD::Jet &jet, Jet &out_jet)

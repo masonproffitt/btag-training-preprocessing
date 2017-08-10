@@ -1,7 +1,10 @@
 #ifndef JET_HH
 #define JET_HH
 
-#include "xAODJet/Jet.h"
+namespace xAOD {
+	class Jet_v1;
+	typedef Jet_v1 Jet;
+}
 
 typedef struct Jet
 {
