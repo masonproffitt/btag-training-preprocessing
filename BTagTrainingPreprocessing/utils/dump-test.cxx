@@ -26,6 +26,7 @@
 #include "xAODCore/tools/PerfStats.h"
 #include "xAODCore/tools/IOStats.h"
 #include "xAODCore/tools/ReadStats.h"
+#include "JetCalibTools/JetCalibrationTool.h"
 #include "xAODTracking/TrackParticleContainer.h"
 #include "xAODJet/JetContainer.h"
 
@@ -44,7 +45,15 @@ int main (int argc, char *argv[])
 	RETURN_CHECK( APP_NAME, xAOD::Init() );
 
 	// Set up the event object:
-	xAOD::TEvent event( xAOD::TEvent::kClassAccess );
+	xAOD::TEvent event(xAOD::TEvent::kClassAccess);
+
+	// Initialize JetCalibrationTool with release 21 recommendations
+	JetCalibrationTool calib_tool("JetCalibToolAntiKt4EMTopo");
+	calib_tool.setProperty("JetCollection", "AntiKt4EMTopo");
+	calib_tool.setProperty("ConfigFile", "JES_MC16Recommendation_Aug2017.config");
+	calib_tool.setProperty("CalibSequence", "JetArea_Residual_EtaJES_GSC");
+	calib_tool.setProperty("IsData", false);
+	RETURN_CHECK( APP_NAME, calib_tool.initializeTool("calib_tool") );
 
 	// Set up output file
 	std::string output_file = "output.h5";
@@ -105,10 +114,13 @@ int main (int argc, char *argv[])
 
 			for (const xAOD::Jet *jet : *jets) {
 				Jet out_jet;
-				fillFlavorTaggingVariables(*jet, out_jet);
-				out_jet.PartonTruthLabelID = jet->auxdata<int>("PartonTruthLabelID");
-				out_jet.HadronConeExclTruthLabelID = jet->auxdata<int>("HadronConeExclTruthLabelID");
+				xAOD::Jet *calib_jet;
+				calib_tool.calibratedCopy(*jet, calib_jet);
+				fillFlavorTaggingVariables(*calib_jet, out_jet);
+				out_jet.PartonTruthLabelID = calib_jet->auxdata<int>("PartonTruthLabelID");
+				out_jet.HadronConeExclTruthLabelID = calib_jet->auxdata<int>("HadronConeExclTruthLabelID");
 				h5writer.add_jet(out_jet);
+				delete calib_jet;
 			}
 		}
 	}

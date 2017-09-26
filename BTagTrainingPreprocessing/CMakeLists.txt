@@ -10,7 +10,9 @@ atlas_depends_on_subdirs(
    PRIVATE
    Control/xAODRootAccess
    Event/xAOD/xAODEventInfo
-   Event/xAOD/xAODCaloCluster )
+   Event/xAOD/xAODCaloCluster
+   Control/AthToolSupport/AsgTools
+   Reconstruction/Jet/JetCalibTools )
 
 # External(s) used by the package:
 find_package( ROOT COMPONENTS Core RIO REQUIRED )
@@ -22,7 +24,7 @@ atlas_add_executable( dump-test
    utils/dump-test.cxx src/*.cxx
    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src
    LINK_LIBRARIES ${ROOT_LIBRARIES}
-   xAODRootAccess xAODCaloEvent xAODTracking xAODJet)
+   xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
 
 # Add HDF5 libraries
 set(HDF5_LIBS
