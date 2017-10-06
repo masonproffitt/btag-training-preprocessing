@@ -1,7 +1,3 @@
-// this next line is magic so we can use the local version of
-// HDF5, see here: https://stackoverflow.com/a/33395489
-#define _GLIBCXX_USE_CXX11_ABI 0
-
 #include "HDF5WriterAbstraction.hh"
 
 #include "HDF5Writer.hh"

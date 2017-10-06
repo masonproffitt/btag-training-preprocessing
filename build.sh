@@ -9,5 +9,5 @@ fi
 
 mkdir -p build
 cd build/
-cmake ..
+cmake -DH5_LOC=${HDF_ROOT} ..
 make -j 4
