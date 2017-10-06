@@ -17,6 +17,16 @@ atlas_depends_on_subdirs(
 # External(s) used by the package:
 find_package( ROOT COMPONENTS Core RIO REQUIRED )
 
+ExternalProject_Add( ttree2hdf5
+  PREFIX ${CMAKE_BINARY_DIR}/externals
+  INSTALL_DIR ${CMAKE_BINARY_DIR}/externals/ttree2hdf5
+  GIT_REPOSITORY "https://github.com/dguest/ttree2hdf5.git"
+  CMAKE_CACHE_ARGS
+  -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}
+  -DH5_LOC:STRING=BUILTIN
+  )
+
+
 include_directories(BEFORE $ENV{ALRB_HDF5_PATH}/include)
 
 # Build the test executable:
