@@ -13,6 +13,7 @@ asetup AnalysisBase,21.2.0
 
 # setup HDF5
 export HDF_ROOT=/afs/cern.ch/user/d/dguest/afswork/public/hdf5/hdf5-1.8.19/install/
+export LD_LIBRARY_PATH=${HDF_ROOT}/lib:${LD_LIBRARY_PATH}
 # echo "=== setting up HDF5 ==="
 # This next line is commented out until we figure out
 #
