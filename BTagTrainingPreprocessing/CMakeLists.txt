@@ -5,7 +5,9 @@
 # Set the name of the package:
 atlas_subdir( BTagTrainingPreprocessing )
 
-set( CMAKE_CXX_FLAGS "-Wno-overloaded-virtual" )
+# turn off an annoying set of warnings I get from HDF5
+string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+set(CMAKE_CXX_FLAGS_DEBUG ${NEW_FLAGS})
 
 # Packages that this package depends on:
 atlas_depends_on_subdirs(

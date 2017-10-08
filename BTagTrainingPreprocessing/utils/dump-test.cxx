@@ -65,8 +65,12 @@ int main (int argc, char *argv[])
 	std::string output_file = "output.h5";
 	HDF5WriterAbstraction h5writer(output_file.c_str());
 
+  BTagJetWriterConfig cfg;
+  cfg.btag_double_variables = { "MV2c10_discriminant" };
+  cfg.track_float_variables = { "chiSquared", "d0" };
+  cfg.track_associator_name = "BTagTrackToJetAssociator";
   H5::H5File output("output-new.h5", H5F_ACC_TRUNC);
-  BTagJetWriter writer(output, {{ "MV2c10_discriminant" }});
+  BTagJetWriter writer(output, cfg);
 
 	// Start the measurement:
 	auto ps = xAOD::PerfStats::instance();
