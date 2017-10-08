@@ -5,6 +5,8 @@
 # Set the name of the package:
 atlas_subdir( BTagTrainingPreprocessing )
 
+set( CMAKE_CXX_FLAGS "-Wno-overloaded-virtual" )
+
 # Packages that this package depends on:
 atlas_depends_on_subdirs(
    PRIVATE
@@ -62,19 +64,21 @@ endif()
 # not sure how to add a subdirectory within atlas properly, so we have
 # this hack
 set(HDFTUPLE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ttree2hdf5/include)
-# set(HdfTuple-libraries ${CMAKE_CURRENT_SOURCE_DIR}
+set(HDFTUPLE_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libHdfTuple-static.a)
 
 # Build the test executable:
 atlas_add_executable( dump-test
   utils/dump-test.cxx src/BTagJetWriter.cxx src/HDF5Defs.cxx
   src/HDF5Writer.cxx src/HDF5WriterAbstraction.cxx
   src/Jet.cxx src/Track.hh
-  INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src
+  INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src ${HDF5_INCLUDE_DIRS}
   LINK_LIBRARIES ${ROOT_LIBRARIES}
   xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
 
 # Add HDF5 libraries
-target_link_libraries(dump-test ${HDF5_LIBRARIES})
+target_link_libraries(dump-test ${HDF5_LIBRARIES} ${HDFTUPLE_LIBRARIES})
 
 # Add HDF5 ntuple writer
-target_include_directories(dump-test PRIVATE ${HDFTUPLE_INCLUDE_DIR})
+target_include_directories(dump-test
+  PRIVATE ${HDFTUPLE_INCLUDE_DIR}
+  ${HDF5_INCLUDE_DIRS})

@@ -10,12 +10,18 @@
 #include "Track.hh"
 #include "Jet.hh"
 
+// new way to do local things
+#include "BTagJetWriter.hh"
+
 // System include(s):
 #include <memory>
 
 // ROOT include(s):
 #include <TFile.h>
 #include <TError.h>
+
+// HDF includes
+#include "H5Cpp.h"
 
 // AnalysisBase tool include(s):
 #include "xAODRootAccess/Init.h"
@@ -58,6 +64,9 @@ int main (int argc, char *argv[])
 	// Set up output file
 	std::string output_file = "output.h5";
 	HDF5WriterAbstraction h5writer(output_file.c_str());
+
+  H5::H5File output("output-new.h5", H5F_ACC_TRUNC);
+  BTagJetWriter writer(output, {{ "MV2c10_discriminant" }});
 
 	// Start the measurement:
 	auto ps = xAOD::PerfStats::instance();
@@ -119,6 +128,7 @@ int main (int argc, char *argv[])
 				fillFlavorTaggingVariables(*calib_jet, out_jet);
 				out_jet.PartonTruthLabelID = calib_jet->auxdata<int>("PartonTruthLabelID");
 				out_jet.HadronConeExclTruthLabelID = calib_jet->auxdata<int>("HadronConeExclTruthLabelID");
+        writer.write_jet(*calib_jet);
 				h5writer.add_jet(out_jet);
 				delete calib_jet;
 			}
