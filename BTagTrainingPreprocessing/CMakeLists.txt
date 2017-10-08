@@ -59,16 +59,8 @@ else()
     ${HDF5_LIB}/libhdf5${SUFFFIX} )
 endif()
 
-ExternalProject_Add( ttree2hdf5
-  PREFIX ${CMAKE_BINARY_DIR}/externals/ttree2hdf5
-  GIT_REPOSITORY "https://github.com/dguest/ttree2hdf5.git"
-  CMAKE_CACHE_ARGS
-  -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}
-  -DH5_LOC:STRING=${H5_LOC}
-  -DROOT_USE_FILE:PATH=${ROOT_USE_FILE})
-
-
-include_directories(BEFORE ${HDF5_INCLUDE_DIRS})
+# message("adding subdir")
+# add_subdirectory(ttree2hdf5)
 
 # Build the test executable:
 atlas_add_executable( dump-test

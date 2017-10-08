@@ -1,0 +1,3 @@
+[submodule "BTagTrainingPreprocessing/ttree2hdf5"]
+	path = BTagTrainingPreprocessing/ttree2hdf5
+	url = git@github.com:dguest/ttree2hdf5.git
