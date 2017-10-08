@@ -59,15 +59,22 @@ else()
     ${HDF5_LIB}/libhdf5${SUFFFIX} )
 endif()
 
-# message("adding subdir")
-# add_subdirectory(ttree2hdf5)
+# not sure how to add a subdirectory within atlas properly, so we have
+# this hack
+set(HDFTUPLE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ttree2hdf5/include)
+# set(HdfTuple-libraries ${CMAKE_CURRENT_SOURCE_DIR}
 
 # Build the test executable:
 atlas_add_executable( dump-test
-   utils/dump-test.cxx src/*.cxx
-   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src
-   LINK_LIBRARIES ${ROOT_LIBRARIES}
-   xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
+  utils/dump-test.cxx src/BTagJetWriter.cxx src/HDF5Defs.cxx
+  src/HDF5Writer.cxx src/HDF5WriterAbstraction.cxx
+  src/Jet.cxx src/Track.hh
+  INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src
+  LINK_LIBRARIES ${ROOT_LIBRARIES}
+  xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
 
 # Add HDF5 libraries
 target_link_libraries(dump-test ${HDF5_LIBRARIES})
+
+# Add HDF5 ntuple writer
+target_include_directories(dump-test PRIVATE ${HDFTUPLE_INCLUDE_DIR})

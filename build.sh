@@ -9,5 +9,7 @@ fi
 
 mkdir -p build
 cd build/
-cmake -DH5_LOC=${HDF_ROOT} ..
+# use a provided HDF path and don't build the more complicated parts
+# of the ntuple maker.
+cmake -DH5_LOC=${HDF_ROOT} -DROOT_DEPENDANTS=NO ..
 make -j 4
