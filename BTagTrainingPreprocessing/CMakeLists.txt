@@ -9,6 +9,10 @@ atlas_subdir( BTagTrainingPreprocessing )
 string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
 set(CMAKE_CXX_FLAGS_DEBUG ${NEW_FLAGS})
 
+# TODO: also do this for these:
+# CMAKE_CXX_FLAGS_RELWITHDEBINFO
+# CMAKE_CXX_FLAGS_RELEASE
+
 # Packages that this package depends on:
 atlas_depends_on_subdirs(
    PRIVATE
