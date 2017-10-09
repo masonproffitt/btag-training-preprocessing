@@ -9,7 +9,7 @@ fi
 
 # use a provided HDF path and don't build the more complicated parts
 # of the ntuple maker.
-cmake -DH5_LOC=${HDF5_ROOT}
+cmake -DH5_LOC=${HDF5_ROOT} ../proj
 make -j 4
 
 ln -s ${AnalysisBase_PLATFORM}/bin/dump-test

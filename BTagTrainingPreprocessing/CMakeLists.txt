@@ -6,8 +6,13 @@
 atlas_subdir( BTagTrainingPreprocessing )
 
 # turn off an annoying set of warnings I get from HDF5
-string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
-set(CMAKE_CXX_FLAGS_DEBUG ${NEW_FLAGS})
+macro( disable_overloaded_warning name )
+  string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${name})
+  set(name "${NEW_FLAGS}")
+endmacro()
+disable_overloaded_warning(CMAKE_CXX_FLAGS_DEBUG)
+disable_overloaded_warning(CMAKE_CXX_FLAGS_RELEASE)
+disable_overloaded_warning(CMAKE_CXX_FLAGS_RELWITHDEBINFO)
 
 # TODO: also do this for these:
 # CMAKE_CXX_FLAGS_RELWITHDEBINFO
