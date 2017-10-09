@@ -35,8 +35,6 @@ else()
     # if we use builtin HDF5, tell ttree2hdf5 to build it
     set(H5_LOC ${CMAKE_BINARY_DIR}/externals/hdf5)
     set(BUILTIN_HDF5 TRUE)
-    # Tell ttree2hdf5 not to build the root parts
-    set(ROOT_DEPENDANTS NO)
   elseif(NOT IS_DIRECTORY ${H5_LOC})
     message(FATAL_ERROR "HDF5 path ${H5_LOC} does not point to a directory")
   endif()
@@ -48,6 +46,9 @@ else()
     ${HDF5_LIB}/libhdf5_hl_cpp${SUFFFIX}
     ${HDF5_LIB}/libhdf5${SUFFFIX} )
 endif()
+
+# Tell ttree2hdf5 not to build the root parts
+set(ROOT_DEPENDANTS NO CACHE BOOL "Build ROOT extensions to ttree2hdf5")
 
 # not sure how to add a subdirectory within atlas properly, so we have
 # this hack
@@ -63,9 +64,9 @@ atlas_add_executable( dump-test
   LINK_LIBRARIES ${ROOT_LIBRARIES}
   xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
 
-# if( BUILTIN_HDF5 )
-#   add_dependencies(dump-test ${HDFTUPLE_LIBRARIES})
-# endif()
+if( BUILTIN_HDF5 )
+  add_dependencies(dump-test HDF5)
+endif()
 
 
 # Add HDF5 libraries
