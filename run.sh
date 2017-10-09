@@ -9,4 +9,4 @@ if [[ ! -f $INPUT_FILE ]] ; then
 fi
 
 # run the script
-./build/${AnalysisBase_PLATFORM}/bin/dump-test $INPUT_FILE
+./dump-test $INPUT_FILE

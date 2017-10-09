@@ -3,17 +3,20 @@ Flavor Tagging Ntuple Dumper
 
 This is to dump b-tagging info from an AnalysisBase release
 
-To compile the code, run:
+To compile the code, go to a clean directory and run run:
 
 ```bash
-source setup.sh
-./build.sh
+git clone --recursive ssh://git@gitlab.cern.ch:7999/mproffit/btag-training-preprocessing.git proj
+mkdir build
+cd build
+source ../proj/setup.sh
+../proj/build.sh
 ```
 
 Then to run a test (on a file which currently lives on AFS) you can use
 
 ```bash
-./run.sh
+../proj/run.sh
 ```
 
 This won't do much right now, but it will compile and test the program in

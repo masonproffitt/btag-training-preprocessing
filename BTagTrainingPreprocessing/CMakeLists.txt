@@ -53,6 +53,7 @@ endif()
 
 # Tell ttree2hdf5 not to build the root parts
 set(ROOT_DEPENDANTS NO CACHE BOOL "Build ROOT extensions to ttree2hdf5")
+set(BUILD_SHARED_HDFTUPLE NO CACHE BOOL "Build shared ttree2hdf5")
 
 # not sure how to add a subdirectory within atlas properly, so we have
 # this hack
