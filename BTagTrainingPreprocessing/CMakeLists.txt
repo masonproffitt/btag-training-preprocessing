@@ -36,24 +36,19 @@ find_package( ZLIB REQUIRED )
 get_filename_component(ZLIB_LIB_DIR ZLIB_LIBRARIES DIRECTORY)
 
 # Find or build HDF5
-set(H5_LOC "FIND" CACHE STRING "Directory where HDF5 lives (or BUILTIN)")
-if(H5_LOC STREQUAL "FIND")
+option(BUILTIN_HDF5 "Build hdf5 internally" NO)
+if( NOT BUILTIN_HDF5 )
   find_package( HDF5 1.8.12 REQUIRED COMPONENTS CXX HL)
 else()
-  if(H5_LOC STREQUAL "BUILTIN")
-    # if we use builtin HDF5, tell ttree2hdf5 to build it
-    set(H5_LOC ${CMAKE_BINARY_DIR}/externals/hdf5)
-    set(BUILTIN_HDF5 TRUE)
-  elseif(NOT IS_DIRECTORY ${H5_LOC})
-    message(FATAL_ERROR "HDF5 path ${H5_LOC} does not point to a directory")
-  endif()
-  set( HDF5_INCLUDE_DIRS "${H5_LOC}/include/")
-  set( HDF5_LIB "${H5_LOC}/lib/")
-  set( SUFFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
-  set( HDF5_LIBRARIES
-    ${HDF5_LIB}/libhdf5_cpp${SUFFFIX}
-    ${HDF5_LIB}/libhdf5_hl_cpp${SUFFFIX}
-    ${HDF5_LIB}/libhdf5${SUFFFIX} )
+  # # if we use builtin HDF5, tell ttree2hdf5 to build it
+  # set( H5_LOC ${CMAKE_BINARY_DIR}/externals/hdf5 )
+  # set( HDF5_INCLUDE_DIRS "${H5_LOC}/include/")
+  # set( HDF5_LIB "${H5_LOC}/lib/")
+  # set( SUFFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
+  # set( HDF5_LIBRARIES
+  #   ${HDF5_LIB}/libhdf5_cpp${SUFFFIX}
+  #   ${HDF5_LIB}/libhdf5_hl_cpp${SUFFFIX}
+  #   ${HDF5_LIB}/libhdf5${SUFFFIX} )
 endif()
 
 # Tell ttree2hdf5 not to build the root parts
@@ -77,7 +72,6 @@ atlas_add_executable( dump-test
 if( BUILTIN_HDF5 )
   add_dependencies(dump-test HDF5)
 endif()
-
 
 # Add HDF5 libraries
 target_link_libraries(dump-test ${HDF5_LIBRARIES} ${HDFTUPLE_LIBRARIES})

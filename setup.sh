@@ -15,7 +15,8 @@ popd
 
 # setup HDF5
 export HDF5_ROOT=/afs/cern.ch/user/d/dguest/afswork/public/hdf5/hdf5-1.8.19/install/
-export LD_LIBRARY_PATH=${HDF_ROOT}/lib:${LD_LIBRARY_PATH}
+export PATH=${HDF5_ROOT}/bin:${PATH}
+export LD_LIBRARY_PATH=${HDF5_ROOT}/lib:${LD_LIBRARY_PATH}
 
 # echo "=== setting up HDF5 ==="
 # This next line is commented out until we figure out
