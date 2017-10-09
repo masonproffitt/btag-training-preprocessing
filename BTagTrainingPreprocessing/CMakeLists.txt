@@ -40,15 +40,15 @@ option(BUILTIN_HDF5 "Build hdf5 internally" NO)
 if( NOT BUILTIN_HDF5 )
   find_package( HDF5 1.8.12 REQUIRED COMPONENTS CXX HL)
 else()
-  # # if we use builtin HDF5, tell ttree2hdf5 to build it
-  # set( H5_LOC ${CMAKE_BINARY_DIR}/externals/hdf5 )
-  # set( HDF5_INCLUDE_DIRS "${H5_LOC}/include/")
-  # set( HDF5_LIB "${H5_LOC}/lib/")
-  # set( SUFFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
-  # set( HDF5_LIBRARIES
-  #   ${HDF5_LIB}/libhdf5_cpp${SUFFFIX}
-  #   ${HDF5_LIB}/libhdf5_hl_cpp${SUFFFIX}
-  #   ${HDF5_LIB}/libhdf5${SUFFFIX} )
+  # if we use builtin HDF5, tell ttree2hdf5 to build it
+  set( H5_LOC ${CMAKE_BINARY_DIR}/externals/hdf5 )
+  set( HDF5_INCLUDE_DIRS "${H5_LOC}/include/")
+  set( HDF5_LIB "${H5_LOC}/lib/")
+  set( SUFFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set( HDF5_LIBRARIES
+    ${HDF5_LIB}/libhdf5_cpp${SUFFFIX}
+    ${HDF5_LIB}/libhdf5_hl_cpp${SUFFFIX}
+    ${HDF5_LIB}/libhdf5${SUFFFIX} )
 endif()
 
 # Tell ttree2hdf5 not to build the root parts
