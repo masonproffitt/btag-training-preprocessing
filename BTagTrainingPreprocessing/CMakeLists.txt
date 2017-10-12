@@ -7,16 +7,12 @@ atlas_subdir( BTagTrainingPreprocessing )
 
 # turn off an annoying set of warnings I get from HDF5
 macro( disable_overloaded_warning name )
-  string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${name})
-  set(name "${NEW_FLAGS}")
+  string(REPLACE "-Woverloaded-virtual" "" NEW_FLAGS ${${name}})
+  set(${name} ${NEW_FLAGS})
 endmacro()
 disable_overloaded_warning(CMAKE_CXX_FLAGS_DEBUG)
 disable_overloaded_warning(CMAKE_CXX_FLAGS_RELEASE)
 disable_overloaded_warning(CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-
-# TODO: also do this for these:
-# CMAKE_CXX_FLAGS_RELWITHDEBINFO
-# CMAKE_CXX_FLAGS_RELEASE
 
 # Packages that this package depends on:
 atlas_depends_on_subdirs(
@@ -24,6 +20,7 @@ atlas_depends_on_subdirs(
    Control/xAODRootAccess
    Event/xAOD/xAODEventInfo
    Event/xAOD/xAODCaloCluster
+   Event/xAOD/xAODTrack
    Control/AthToolSupport/AsgTools
    Reconstruction/Jet/JetCalibTools )
 
@@ -64,6 +61,7 @@ set(HDFTUPLE_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libHdfTuple-static.a)
 atlas_add_executable( dump-test
   utils/dump-test.cxx src/BTagJetWriter.cxx src/HDF5Defs.cxx
   src/HDF5Writer.cxx src/HDF5WriterAbstraction.cxx
+  src/BTagTrackWriter.cxx
   src/Jet.cxx src/Track.hh
   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src ${HDF5_INCLUDE_DIRS}
   LINK_LIBRARIES ${ROOT_LIBRARIES}

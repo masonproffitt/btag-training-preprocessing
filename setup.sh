@@ -10,9 +10,6 @@ lsetup asetup
 echo "=== running asetup ==="
 asetup AnalysisBase,21.2.0
 
-# go pack to where we started
-popd
-
 # setup HDF5
 export HDF5_ROOT=/afs/cern.ch/user/d/dguest/afswork/public/hdf5/hdf5-1.8.19/install/
 export PATH=${HDF5_ROOT}/bin:${PATH}

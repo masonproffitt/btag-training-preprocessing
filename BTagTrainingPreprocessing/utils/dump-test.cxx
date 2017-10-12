@@ -11,7 +11,9 @@
 #include "Jet.hh"
 
 // new way to do local things
+#include "BTagWriterConfig.hh"
 #include "BTagJetWriter.hh"
+#include "BTagTrackWriter.hh"
 
 // System include(s):
 #include <memory>
@@ -65,12 +67,20 @@ int main (int argc, char *argv[])
 	std::string output_file = "output.h5";
 	HDF5WriterAbstraction h5writer(output_file.c_str());
 
-  BTagJetWriterConfig cfg;
-  cfg.btag_double_variables = { "MV2c10_discriminant" };
-  cfg.track_float_variables = { "chiSquared", "d0" };
-  cfg.track_associator_name = "BTagTrackToJetAssociator";
+  // new way to do output files
   H5::H5File output("output-new.h5", H5F_ACC_TRUNC);
-  BTagJetWriter writer(output, cfg);
+  // set up jet writer
+  BTagWriterConfig jet_cfg;
+  jet_cfg.double_variables = { "MV2c10_discriminant" };
+  jet_cfg.float_variables = {};
+  jet_cfg.name = "jets";
+  BTagJetWriter jet_writer(output, jet_cfg);
+  // set up track writer
+  BTagWriterConfig track_cfg;
+  track_cfg.name = "tracks";
+  track_cfg.float_variables = { "chiSquared", "d0"};
+  track_cfg.output_size = {10};
+  BTagTrackWriter track_writer(output, track_cfg);
 
 	// Start the measurement:
 	auto ps = xAOD::PerfStats::instance();
@@ -126,18 +136,33 @@ int main (int argc, char *argv[])
 			RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKt4EMTopoJets") );
 
 			for (const xAOD::Jet *jet : *jets) {
+        typedef ElementLink<xAOD::TrackParticleContainer> TrackLink;
+        typedef std::vector<TrackLink> TrackLinks;
+
 				Jet out_jet;
 				xAOD::Jet *calib_jet;
 				calib_tool.calibratedCopy(*jet, calib_jet);
+        std::vector<const xAOD::TrackParticle*> tracks;
+        TrackLinks links = calib_jet->btagging()->auxdata<TrackLinks>(
+          "BTagTrackToJetAssociator");
+        for (const auto& link: links) {
+          const xAOD::TrackParticle* track = *link;
+          // do some kind of slection here, plus sorting
+          tracks.push_back(track);
+        }
+        track_writer.write(tracks);
+
 				fillFlavorTaggingVariables(*calib_jet, out_jet);
 				out_jet.PartonTruthLabelID = calib_jet->auxdata<int>("PartonTruthLabelID");
 				out_jet.HadronConeExclTruthLabelID = calib_jet->auxdata<int>("HadronConeExclTruthLabelID");
-        writer.write_jet(*calib_jet);
+        jet_writer.write(*calib_jet);
 				h5writer.add_jet(out_jet);
 				delete calib_jet;
 			}
 		}
 	}
+  // jet_writer.flush();
+  // track_writer.flush();
 
 	h5writer.flush();
 	h5writer.close();

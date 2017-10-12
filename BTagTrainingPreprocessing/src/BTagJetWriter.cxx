@@ -1,41 +1,46 @@
 #include "BTagJetWriter.hh"
+#include "BTagWriterConfig.hh"
 #include "HdfTuple.hh"
 
 
 BTagJetWriter::BTagJetWriter(
   H5::CommonFG& output_file,
-  const BTagJetWriterConfig& config):
-  m_track_associator_name(config.track_associator_name)
+  const BTagWriterConfig& config)
 {
 
-  // We can cast the doubles to floats to save space. This typedef
-  // controls what type we end up saving.
-  typedef float outdouble_t;
-
+  // create the variable fillers
   VariableFillers fillers;
-  add_btag_fillers<double, float>(fillers, config.btag_double_variables);
-  add_btag_fillers<float, float>(fillers, config.btag_float_variables);
-  add_btag_fillers<int, int>(fillers, config.btag_int_variables);
-  m_hdf5_jet_writer = new WriterXd(output_file, "high_level", fillers, {});
+  // in this case we convert doubles to floats to save space, note
+  // that you can change the second parameter to a double to get full
+  // precision.
+  add_btag_fillers<double, float>(fillers, config.double_variables);
+  add_btag_fillers<float>(fillers, config.float_variables);
+  add_btag_fillers<int>(fillers, config.int_variables);
 
-  VariableFillers track_fillers;
-  add_track_fillers<float, float>(track_fillers,
-                                  config.track_float_variables, NAN);
-  m_hdf5_track_writer = new WriterXd(output_file, "tracks",
-                                     track_fillers, {10});
+  // some things like 4 momenta have to be hand coded
+  std::function<float(void)> pt = [this]() {
+    return this->m_current_jet->pt();
+  };
+  fillers.add("pt", pt);
+  std::function<float(void)> eta = [this]() {
+    return this->m_current_jet->eta();
+  };
+  fillers.add("eta", eta);
+
+  // now create the writer
+  assert(config.name.size() > 0);
+  m_hdf5_jet_writer = new WriterXd(output_file, config.name, fillers,{});
+  assert(config.output_size.size() == 0);
 }
 
 BTagJetWriter::~BTagJetWriter() {
   m_hdf5_jet_writer->flush();
   delete m_hdf5_jet_writer;
-  m_hdf5_track_writer->flush();
-  delete m_hdf5_track_writer;
 }
 
-void BTagJetWriter::write_jet(const xAOD::Jet& jet) {
+void BTagJetWriter::write(const xAOD::Jet& jet) {
   m_current_jet = &jet;
   m_hdf5_jet_writer->fill_while_incrementing();
-  m_hdf5_track_writer->fill_while_incrementing(m_track_index);
 }
 
 template<typename I, typename O>
@@ -44,28 +49,6 @@ void BTagJetWriter::add_btag_fillers(VariableFillers& vars,
   for (const auto& btag_var: names) {
     std::function<O(void)> filler = [this, btag_var]() {
       return this->m_current_jet->btagging()->auxdata<I>(btag_var);
-    };
-    vars.add(btag_var, filler);
-  }
-}
-
-template<typename I, typename O>
-void BTagJetWriter::add_track_fillers(VariableFillers& vars,
-                                      const std::vector<std::string>& names,
-                                      O def_value) {
-  typedef ElementLink<xAOD::TrackParticleContainer> TrackLink;
-  typedef std::vector<TrackLink> TrackLinks;
-
-  for (const auto& btag_var: names) {
-    std::function<O(void)> filler = [this, btag_var, def_value]() {
-      TrackLinks links = this->m_current_jet->btagging()->auxdata<TrackLinks>(
-        this->m_track_associator_name);
-      size_t index = this->m_track_index.at(0);
-      if (index >= links.size()) {
-        return def_value;
-      }
-      const xAOD::TrackParticle *trk = *links.at(index);
-      return trk->auxdata<I>(btag_var);
     };
     vars.add(btag_var, filler);
   }
