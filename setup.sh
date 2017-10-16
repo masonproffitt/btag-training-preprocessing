@@ -11,6 +11,7 @@ echo "=== running asetup ==="
 asetup AnalysisBase,21.2.0
 
 # setup HDF5
+# export HDF5_ROOT=/cvmfs/sft-nightlies.cern.ch/lcg/nightlies/dev4/Mon/hdf5/1.8.18/x86_64-slc6-gcc62-opt
 export HDF5_ROOT=/afs/cern.ch/user/d/dguest/afswork/public/hdf5/hdf5-1.8.19/install/
 export PATH=${HDF5_ROOT}/bin:${PATH}
 export LD_LIBRARY_PATH=${HDF5_ROOT}/lib:${LD_LIBRARY_PATH}
