@@ -6,7 +6,6 @@
 /// be done.
 
 // local inclues
-#include "HDF5WriterAbstraction.hh"
 #include "Track.hh"
 #include "Jet.hh"
 
@@ -21,6 +20,7 @@
 // ROOT include(s):
 #include <TFile.h>
 #include <TError.h>
+#include <TLorentzVector.h>
 
 // HDF includes
 #include "H5Cpp.h"
@@ -35,8 +35,13 @@
 #include "xAODCore/tools/IOStats.h"
 #include "xAODCore/tools/ReadStats.h"
 #include "JetCalibTools/JetCalibrationTool.h"
+#include "JetSelectorTools/JetCleaningTool.h"
 #include "xAODTracking/TrackParticleContainer.h"
+#include "JetMomentTools/JetVertexTaggerTool.h"
+#include "JetJvtEfficiency/JetJvtEfficiency.h"
+#include "InDetTrackSelectionTool/InDetTrackSelectionTool.h"
 #include "xAODJet/JetContainer.h"
+#include "xAODTruth/TruthEventContainer.h"
 
 int main (int argc, char *argv[])
 {
@@ -61,26 +66,38 @@ int main (int argc, char *argv[])
 	calib_tool.setProperty("ConfigFile", "JES_MC16Recommendation_Aug2017.config");
 	calib_tool.setProperty("CalibSequence", "JetArea_Residual_EtaJES_GSC");
 	calib_tool.setProperty("IsData", false);
-	RETURN_CHECK( APP_NAME, calib_tool.initializeTool("calib_tool") );
+	RETURN_CHECK( APP_NAME, calib_tool.initialize() );
 
-	// Set up output file
-	std::string output_file = "output.h5";
-	HDF5WriterAbstraction h5writer(output_file.c_str());
+	JetCleaningTool jetcleaningtool("JetCleaningTool", JetCleaningTool::LooseBad, false);
+	RETURN_CHECK( APP_NAME, jetcleaningtool.initialize() );
+	
+	InDet::InDetTrackSelectionTool indettrackselectiontool("InDetTrackSelectionTool", "Loose");
+	RETURN_CHECK( APP_NAME, indettrackselectiontool.initialize() );
+	
+	JetVertexTaggerTool jvttool("JetVertexTaggerTool");
+	RETURN_CHECK( APP_NAME, jvttool.initialize() );
+	
+	CP::JetJvtEfficiency jvtefficiencytool("JetJvtEfficiency");
+	jvtefficiencytool.setProperty("WorkingPoint", "Medium");
+	jvtefficiencytool.setProperty("SFFile","JetJvtEfficiency/Moriond2017/JvtSFFile_EM.root");
+	RETURN_CHECK( APP_NAME, jvtefficiencytool.initialize() );
 
-  // new way to do output files
-  H5::H5File output("output-new.h5", H5F_ACC_TRUNC);
-  // set up jet writer
-  BTagWriterConfig jet_cfg;
-  jet_cfg.double_variables = { "MV2c10_discriminant" };
-  jet_cfg.float_variables = {};
-  jet_cfg.name = "jets";
-  BTagJetWriter jet_writer(output, jet_cfg);
-  // set up track writer
-  BTagWriterConfig track_cfg;
-  track_cfg.name = "tracks";
-  track_cfg.float_variables = { "chiSquared", "d0"};
-  track_cfg.output_size = {10};
-  BTagTrackWriter track_writer(output, track_cfg);
+	// new way to do output files
+	H5::H5File output("output.h5", H5F_ACC_TRUNC);
+	// set up jet writer
+	BTagWriterConfig jet_cfg;
+	jet_cfg.double_variables = {"pt", "eta", "MV2c10_discriminant", "IP2D_pb", "IP2D_pc", "IP2D_pu", "IP3D_pb", "IP3D_pc", "IP3D_pu", "SV1_pu", "SV1_pb", "SV1_pc", "rnnip_pu", "rnnip_pc", "rnnip_pb", "rnnip_ptau"};
+	jet_cfg.float_variables = {"JetFitter_energyFraction", "JetFitter_mass", "JetFitter_significance3d", "JetFitter_deltaphi", "JetFitter_deltaeta", "JetFitter_massUncorr", "JetFitter_dRFlightDir", "SV1_masssvx", "SV1_efracsvx", "SV1_significance3d", "SV1_dstToMatLay", "SV1_deltaR", "SV1_Lxy", "SV1_L3d"};
+	jet_cfg.int_variables = {"JetFitter_nVTX", "JetFitter_nSingleTracks", "JetFitter_nTracksAtVtx", "JetFitter_N2Tpair", "SV1_N2Tpair", "SV1_NGTinSvx", "PartonTruthLabelID", "HadronConeExclTruthLabelID"};
+	jet_cfg.name = "jets";
+	BTagJetWriter jet_writer(output, jet_cfg);
+	// set up track writer
+	BTagWriterConfig track_cfg;
+	track_cfg.name = "tracks";
+	track_cfg.double_variables = {"pt", "eta"};
+	track_cfg.float_variables = {"chiSquared", "d0"};
+	track_cfg.output_size = {10};
+	BTagTrackWriter track_writer(output, track_cfg);
 
 	// Start the measurement:
 	auto ps = xAOD::PerfStats::instance();
@@ -115,57 +132,72 @@ int main (int argc, char *argv[])
 				Info( APP_NAME, "Processing entry %lld / %lld", entry, entries );
 			}
 
-			// Read the track particles:
-			const xAOD::TrackParticleContainer *tpc = 0;
-			RETURN_CHECK( APP_NAME, event.retrieve(tpc, "InDetTrackParticles") );
-
-			// make a vector to store tracks to HDF5. Note that these
-			// should come from the tracks associated to jets in the
-			// future.
-			std::vector<Track> tracks;
-
-			// Read in its core variables:
-			for (const xAOD::TrackParticle *tp : *tpc) {
-				Track out_track;
-				out_track.pt = tp->pt();
-				tracks.push_back(out_track);
-			}
-			h5writer.add_tracks(tracks);
-
 			const xAOD::JetContainer *jets = 0;
 			RETURN_CHECK( APP_NAME, event.retrieve(jets, "AntiKt4EMTopoJets") );
 
-			for (const xAOD::Jet *jet : *jets) {
-        typedef ElementLink<xAOD::TrackParticleContainer> TrackLink;
-        typedef std::vector<TrackLink> TrackLinks;
+			const xAOD::TruthEventContainer *truth_events = 0;
+			RETURN_CHECK( APP_NAME, event.retrieve(truth_events, "TruthEvents") );
 
-				Jet out_jet;
+			for (const xAOD::Jet *jet : *jets) {
 				xAOD::Jet *calib_jet;
 				calib_tool.calibratedCopy(*jet, calib_jet);
-        std::vector<const xAOD::TrackParticle*> tracks;
-        TrackLinks links = calib_jet->btagging()->auxdata<TrackLinks>(
-          "BTagTrackToJetAssociator");
-        for (const auto& link: links) {
-          const xAOD::TrackParticle* track = *link;
-          // do some kind of slection here, plus sorting
-          tracks.push_back(track);
-        }
-        track_writer.write(tracks);
+				jvttool.updateJvt(*calib_jet);
+				if ( ! jetcleaningtool.keep(*calib_jet) || ! jvtefficiencytool.passesJvtCut(*calib_jet)) {
+					continue;
+				}
+				if (calib_jet->pt() < 20000 || fabs(calib_jet->eta()) > 2.5) {
+					continue;
+				}
 
-				fillFlavorTaggingVariables(*calib_jet, out_jet);
-				out_jet.PartonTruthLabelID = calib_jet->auxdata<int>("PartonTruthLabelID");
-				out_jet.HadronConeExclTruthLabelID = calib_jet->auxdata<int>("HadronConeExclTruthLabelID");
-        jet_writer.write(*calib_jet);
-				h5writer.add_jet(out_jet);
+				bool overlap_skip = false;
+				for (const xAOD::TruthEvent *truth_event : *truth_events) {
+					for(unsigned truth_event_index = 0; truth_event_index < truth_event->nTruthParticles(); truth_event_index++) {
+						const xAOD::TruthParticle *truth_particle = truth_event->truthParticle(truth_event_index);
+						if (abs(truth_particle->pdgId()) == 11) {
+							if (truth_particle->pt() < 10000) {
+								continue;
+							}
+							TLorentzVector truth_lorentz_vector;
+							truth_lorentz_vector.SetPtEtaPhiM(truth_particle->pt(), truth_particle->eta(), truth_particle->phi(), truth_particle->m());
+							if (calib_jet->p4().DeltaR(truth_lorentz_vector) < 0.3) {
+								overlap_skip = true;
+								break;
+							}
+						}
+					}
+					if (overlap_skip) {
+						break;
+					}
+				}
+				if (overlap_skip) {
+					continue;
+				}
+
+				jet_writer.write(*calib_jet);
+
+				// make a vector to store tracks to HDF5.
+				std::vector<const xAOD::TrackParticle *> tracks;
+				// Read the track particles:
+				const xAOD::BTagging *btagging = calib_jet->btagging();
+				auto links = btagging->auxdata<std::vector<ElementLink<xAOD::TrackParticleContainer> > >("BTagTrackToJetAssociator");
+				for (const auto &link : links) {
+					if(link.isValid()) {
+						const xAOD::TrackParticle *tp = *link;
+						if ( ! indettrackselectiontool.accept(tp)) {
+							continue;
+						}
+						// do some kind of slection here, plus sorting
+						tracks.push_back(tp);
+					}
+				}
+				track_writer.write(tracks);
+
 				delete calib_jet;
 			}
 		}
 	}
-  // jet_writer.flush();
-  // track_writer.flush();
-
-	h5writer.flush();
-	h5writer.close();
+	// jet_writer.flush();
+	// track_writer.flush();
 
 	// Stop the measurement:
 	ps.stop();

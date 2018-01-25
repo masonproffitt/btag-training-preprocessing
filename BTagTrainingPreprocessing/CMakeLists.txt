@@ -22,7 +22,11 @@ atlas_depends_on_subdirs(
    Event/xAOD/xAODCaloCluster
    Event/xAOD/xAODTrack
    Control/AthToolSupport/AsgTools
-   Reconstruction/Jet/JetCalibTools )
+   Reconstruction/Jet/JetCalibTools
+   Reconstruction/Jet/JetSelectorTools
+   InnerDetector/InDetRecTools/InDetTrackSelectionTool
+   Reconstruction/Jet/JetMomentTools
+   Reconstruction/Jet/JetJvtEfficiency )
 
 # External(s) used by the package:
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
@@ -65,7 +69,7 @@ atlas_add_executable( dump-test
   src/Jet.cxx src/Track.hh
   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} src ${HDF5_INCLUDE_DIRS}
   LINK_LIBRARIES ${ROOT_LIBRARIES}
-  xAODRootAccess xAODCaloEvent xAODTracking xAODJet AsgTools JetCalibToolsLib)
+  xAODRootAccess xAODCaloEvent xAODTracking xAODJet xAODTruth AsgTools JetCalibToolsLib JetSelectorToolsLib InDetTrackSelectionToolLib JetMomentToolsLib JetJvtEfficiencyLib )
 
 if( BUILTIN_HDF5 )
   add_dependencies(dump-test HDF5)
