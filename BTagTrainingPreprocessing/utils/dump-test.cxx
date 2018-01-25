@@ -10,7 +10,8 @@
 #include "Jet.hh"
 
 // new way to do local things
-#include "BTagWriterConfig.hh"
+#include "BTagTrackWriterConfig.hh"
+#include "BTagJetWriterConfig.hh"
 #include "BTagJetWriter.hh"
 #include "BTagTrackWriter.hh"
 
@@ -85,16 +86,31 @@ int main (int argc, char *argv[])
 	// new way to do output files
 	H5::H5File output("output.h5", H5F_ACC_TRUNC);
 	// set up jet writer
-	BTagWriterConfig jet_cfg;
-	jet_cfg.double_variables = {"pt", "eta", "MV2c10_discriminant", "IP2D_pb", "IP2D_pc", "IP2D_pu", "IP3D_pb", "IP3D_pc", "IP3D_pu", "SV1_pu", "SV1_pb", "SV1_pc", "rnnip_pu", "rnnip_pc", "rnnip_pb", "rnnip_ptau"};
-	jet_cfg.float_variables = {"JetFitter_energyFraction", "JetFitter_mass", "JetFitter_significance3d", "JetFitter_deltaphi", "JetFitter_deltaeta", "JetFitter_massUncorr", "JetFitter_dRFlightDir", "SV1_masssvx", "SV1_efracsvx", "SV1_significance3d", "SV1_dstToMatLay", "SV1_deltaR", "SV1_Lxy", "SV1_L3d"};
-	jet_cfg.int_variables = {"JetFitter_nVTX", "JetFitter_nSingleTracks", "JetFitter_nTracksAtVtx", "JetFitter_N2Tpair", "SV1_N2Tpair", "SV1_NGTinSvx", "PartonTruthLabelID", "HadronConeExclTruthLabelID"};
+	BTagJetWriterConfig jet_cfg;
+	jet_cfg.double_variables = {
+    "MV2c10_discriminant",
+    "IP2D_pb", "IP2D_pc", "IP2D_pu",
+    "IP3D_pb", "IP3D_pc", "IP3D_pu",
+    "SV1_pu", "SV1_pb", "SV1_pc",
+    "rnnip_pu", "rnnip_pc", "rnnip_pb", "rnnip_ptau"};
+	jet_cfg.float_variables = {
+    "JetFitter_energyFraction", "JetFitter_mass",
+    "JetFitter_significance3d", "JetFitter_deltaphi", "JetFitter_deltaeta",
+    "JetFitter_massUncorr", "JetFitter_dRFlightDir",
+    "SV1_masssvx", "SV1_efracsvx", "SV1_significance3d", "SV1_dstToMatLay",
+    "SV1_deltaR", "SV1_Lxy", "SV1_L3d"};
+	jet_cfg.int_variables = {
+    "JetFitter_nVTX", "JetFitter_nSingleTracks", "JetFitter_nTracksAtVtx",
+    "JetFitter_N2Tpair",
+    "SV1_N2Tpair", "SV1_NGTinSvx"};
+  jet_cfg.truth_labels = {
+    "PartonTruthLabelID",
+    "HadronConeExclTruthLabelID"};
 	jet_cfg.name = "jets";
 	BTagJetWriter jet_writer(output, jet_cfg);
 	// set up track writer
-	BTagWriterConfig track_cfg;
+	BTagTrackWriterConfig track_cfg;
 	track_cfg.name = "tracks";
-	track_cfg.double_variables = {"pt", "eta"};
 	track_cfg.float_variables = {"chiSquared", "d0"};
 	track_cfg.output_size = {10};
 	BTagTrackWriter track_writer(output, track_cfg);
