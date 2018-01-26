@@ -1,11 +1,11 @@
 #include "BTagJetWriter.hh"
-#include "BTagWriterConfig.hh"
+#include "BTagJetWriterConfig.hh"
 #include "HdfTuple.hh"
 
 
 BTagJetWriter::BTagJetWriter(
   H5::CommonFG& output_file,
-  const BTagWriterConfig& config)
+  const BTagJetWriterConfig& config)
 {
 
   // create the variable fillers
@@ -16,6 +16,7 @@ BTagJetWriter::BTagJetWriter(
   add_btag_fillers<double, float>(fillers, config.double_variables);
   add_btag_fillers<float>(fillers, config.float_variables);
   add_btag_fillers<int>(fillers, config.int_variables);
+  add_truth_labels(fillers, config.truth_labels);
 
   // some things like 4 momenta have to be hand coded
   std::function<float(void)> pt = [this]() {
@@ -51,5 +52,15 @@ void BTagJetWriter::add_btag_fillers(VariableFillers& vars,
       return this->m_current_jet->btagging()->auxdata<I>(btag_var);
     };
     vars.add(btag_var, filler);
+  }
+}
+
+void BTagJetWriter::add_truth_labels(VariableFillers& vars,
+                                     const std::vector<std::string>& names) {
+  for (const auto& label: names) {
+    std::function<int(void)> filler = [this, label]() {
+      return this->m_current_jet->auxdata<int>(label);
+    };
+    vars.add(label, filler);
   }
 }

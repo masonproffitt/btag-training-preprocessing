@@ -1,5 +1,5 @@
 #include "BTagTrackWriter.hh"
-#include "BTagWriterConfig.hh"
+#include "BTagTrackWriterConfig.hh"
 #include "HdfTuple.hh"
 
 // Less Standard Libraries (for atlas)
@@ -10,7 +10,7 @@
 
 BTagTrackWriter::BTagTrackWriter(
   H5::CommonFG& output_file,
-  const BTagWriterConfig& config):
+  const BTagTrackWriterConfig& config):
   m_current_tracks()
 {
 

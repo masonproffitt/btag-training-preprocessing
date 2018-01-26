@@ -14,14 +14,14 @@
 #include <string>
 #include <vector>
 
-class BTagWriterConfig;
+class BTagJetWriterConfig;
 
 class BTagJetWriter
 {
 public:
   BTagJetWriter(
     H5::CommonFG& output_file,
-    const BTagWriterConfig&);
+    const BTagJetWriterConfig& jet);
   ~BTagJetWriter();
   BTagJetWriter(BTagJetWriter&) = delete;
   BTagJetWriter operator=(BTagJetWriter&) = delete;
@@ -29,6 +29,7 @@ public:
 private:
   template<typename I, typename O = I>
   void add_btag_fillers(VariableFillers&, const std::vector<std::string>&);
+  void add_truth_labels(VariableFillers&, const std::vector<std::string>&);
   const xAOD::Jet* m_current_jet;
   WriterXd* m_hdf5_jet_writer;
 };

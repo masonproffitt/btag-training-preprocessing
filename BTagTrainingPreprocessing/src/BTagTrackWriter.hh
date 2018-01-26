@@ -14,7 +14,7 @@ namespace xAOD {
 }
 
 class VariableFillers;
-class BTagWriterConfig;
+class BTagTrackWriterConfig;
 class WriterXd;
 
 class BTagTrackWriter
@@ -23,7 +23,7 @@ public:
   typedef std::vector<const xAOD::TrackParticle*> Tracks;
   BTagTrackWriter(
     H5::CommonFG& output_file,
-    const BTagWriterConfig&);
+    const BTagTrackWriterConfig&);
   ~BTagTrackWriter();
   BTagTrackWriter(BTagTrackWriter&) = delete;
   BTagTrackWriter operator=(BTagTrackWriter&) = delete;
